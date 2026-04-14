@@ -1,0 +1,3 @@
+/vendor/ 
+.env  /storage/* 
+!/storage/.gitkeep  .vscode/  .idea/  /public/assets/uploads/  .DS_Store  Thumbs.db 
