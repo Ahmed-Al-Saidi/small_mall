@@ -1,33 +1,49 @@
 <?php
 namespace App\Core;
-class Router{
+
+class Router {
     private $routes = [];
-    public function add($route,$params)
-    {
-      $this->route[$route] = $params;
+
+    public function add($route, $params) {
+        // تحويل الروابط إلى تعبيرات نمطية (Regex) لدعم المتغيرات مثل {id}
+        $route = preg_replace('/\//', '\\/', $route);
+        $route = preg_replace('/\{([a-z]+)\}/', '(?P<\1>[a-z0-9-]+)', $route);
+        $route = '/^' . $route . '$/i';
+        $this->routes[$route] = $params;
     }
-    public function dispatch($url)
-    {
+
+    public function dispatch($url) {
         $url = $this->removeQueryString($url);
-        if (array_key_exists($url, $this->route)) {
-            $controller = 'App\\controllers\\' . $this->route[$url]['controller'];
-            $action= $this->route[$url]['action'];
-            if (class_exists($controller)) {
-                $controllerObject = new $controller();
-                if (method_exists($controllerObject, $action)) {
-                    $controllerObject->$action();
-                } else {
-                    echo "Method." . $action . " not found: " ;
+        foreach ($this->routes as $route => $params) {
+            if (preg_match($route, $url, $matches)) {
+                foreach ($matches as $key => $match) {
+                    if (is_string($key)) {
+                        $params[$key] = $match;
+                    }
                 }
-            } else {
-                echo "Controller".$controller."not found: " ;
+
+                $controller = 'App\\controllers\\' . $params['controller'];
+                $action = $params['action'];
+
+                if (class_exists($controller)) {
+                    $controllerObject = new $controller();
+                    if (method_exists($controllerObject, $action)) {
+                        unset($params['controller']);
+                        unset($params['action']);
+                        call_user_func_array([$controllerObject, $action], $params);
+                    } else {
+                        echo "Method $action not found in $controller";
+                    }
+                } else {
+                    echo "Controller $controller not found";
+                }
+                return;
             }
-        } else {
-            echo "Route not found: " . $url;
         }
+        echo "Route not found: $url";
     }
-    public function removeQueryString($url)
-    {
+
+    protected function removeQueryString($url) {
         if ($url != '') {
             $parts = explode('&', $url, 2);
             if (strpos($parts[0], '=') === false) {
@@ -36,7 +52,4 @@ class Router{
         }
         return $url;
     }
-
-
 }
-?>
