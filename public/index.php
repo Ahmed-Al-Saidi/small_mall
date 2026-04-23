@@ -13,12 +13,18 @@ sql_auto_register(function($class) {
         }
     }
 );
+
 use App\Core\Router;
+
 $router = new Router();
+
+// تعريف المسارات
 $router->add('', ['controller' => 'HomeController', 'action' => 'index']);
 $router->add('shop', ['controller' => 'ShopController', 'action' => 'index']);
 $router->add('admin/products', ['controller' => 'AdminProductController', 'action' => 'index']);
+$router->add('admin/products/delete/{id}', ['controller' => 'AdminProductController', 'action' => 'delete']);
 
-$url=$GET['url'] ?? '';
+$url = $_GET['url'] ?? '';
 $router->dispatch($url);
-?>  
+
+?>
