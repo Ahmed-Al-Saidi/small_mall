@@ -11,11 +11,7 @@ spl_autoload_register(function($class) {
     if (file_exists($file)) {
         require $file;
     }
-<<<<<<< HEAD
 });
-=======
-);
->>>>>>> 6e22e8134fea1452b59910e337d3577a5587a3d4
 
 use App\Core\Router;
 
@@ -29,8 +25,4 @@ $router->add('admin/products/delete/{id}', ['controller' => 'AdminProductControl
 
 $url = $_GET['url'] ?? '';
 $router->dispatch($url);
-<<<<<<< HEAD
-=======
-
->>>>>>> 6e22e8134fea1452b59910e337d3577a5587a3d4
 ?>
