@@ -90,7 +90,23 @@
                 if (session_status() !== PHP_SESSION_ACTIVE) {
                     @session_start();
                 }
-                if (!empty($_SESSION['is_admin']) && $_SESSION['is_admin'] === true): ?>
+
+                $isAdmin = false;
+                $username = null;
+                if (!empty($_SESSION['user_id'])) {
+                    try {
+                        $userModel = new \App\Models\User();
+                        $u = $userModel->findById($_SESSION['user_id']);
+                        if ($u && (!empty($u['is_admin']) || ($u['role'] ?? '') === 'admin')) {
+                            $isAdmin = true;
+                            $username = $u['username'] ?? null;
+                        }
+                    } catch (\Throwable $e) {
+                        // fail silently and treat as non-admin
+                    }
+                }
+
+                if ($isAdmin): ?>
                     <a href="/admin/products" class="btn btn-outline"><i class="fas fa-tools"></i> لوحة التحكم</a>
                     <a href="/logout" class="btn btn-ghost"><i class="fas fa-sign-out-alt"></i> خروج</a>
                 <?php else: ?>
