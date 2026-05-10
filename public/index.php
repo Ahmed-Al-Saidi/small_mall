@@ -1,5 +1,9 @@
 <?php
-spl_autoload_register(function($class) {
+// Start session for authentication
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+spl_autoload_register(function ($class) {
     $prefix = 'App\\';
     $base_dir = __DIR__ . '/../app/';
     $len = strlen($prefix);
@@ -11,7 +15,6 @@ spl_autoload_register(function($class) {
     if (file_exists($file)) {
         require $file;
     }
-
 });
 
 
@@ -22,9 +25,13 @@ $router = new Router();
 // تعريف المسارات
 $router->add('', ['controller' => 'HomeController', 'action' => 'index']);
 $router->add('shop', ['controller' => 'ShopController', 'action' => 'index']);
+$router->add('login', ['controller' => 'AuthController', 'action' => 'login']);
+$router->add('login/auth', ['controller' => 'AuthController', 'action' => 'authenticate']);
+$router->add('logout', ['controller' => 'AuthController', 'action' => 'logout']);
 $router->add('admin/products', ['controller' => 'AdminProductController', 'action' => 'index']);
 $router->add('admin/products/delete/{id}', ['controller' => 'AdminProductController', 'action' => 'delete']);
+$router->add('admin/products/create', ['controller' => 'AdminProductController', 'action' => 'create']);
+$router->add('admin/products/store', ['controller' => 'AdminProductController', 'action' => 'store']);
 
 $url = $_GET['url'] ?? '';
 $router->dispatch($url);
-?>
